@@ -1,0 +1,34 @@
+I. Kích thước màn hình Game
+- Kích thước: 1280 x 720 (HD)
+
+II. Các đối tượng trong game
+1. Quả cầu tròn (Main character)
+- Hình dạng: Hình tròn
+- Kích cỡ: 
++ Radius:
++ Color: Black
+2. Các trụ vật cản (Môi trường)
+- Hình dạng: Hình chữ nhật
+- Kích cỡ: 
++ Width-Height:
+
+III. Gameplay
+1. Quả cầu tròn (Main character)
+- Di chuyển theo chiều ngang và có xu hướng đi xuống.
+- Khi người chơi nhấn nút [Space] thì quả cầu sẽ nảy lên 1 đoạn theo hướng lên trên.
+2. Các trụ vật cản (Môi trường)
+- Được dùng để cản "Quả cầu tròn" đi qua.
+- Mỗi chướng ngại mà "Quả cầu tròn" đi qua thì sẽ có 2 trụ với 1 khe hở duy nhất để đi qua.
+- Với mỗi khe hở đi qua thì "Người chơi" sẽ được "cộng 100 điểm".
+- Tốc độ "Quả cầu tròn" sẽ tăng lên với mỗi lần đạt được "500 điểm" tính từ mốc đầu tiên hay mốc đã đạt được tiếp theo. Ví dụ từ mốc 0 -> 500 thì sẽ tăng tốc độ, mốc 500 -> 1000 sẽ tăng tiếp.
+3. Kết thúc game
+- Khi đạt tới "2000 điểm" thì sẽ có hiện ra màn hình "You Win" với số điểm đã đạt được.
+- Nếu "quả cầu" chạm vào "các trụ" thì người chơi sẽ thua và hiện ra màn hình "You Lose" với số điểm đã đạt được.
+
+
+
+DrawCircle(300, 400, 50, RED);
+
+DrawRectangle(50, 0, 50, 250, BLACK);
+
+DrawRectangle(50, 250 + 180, 50, 250, BLUE);
