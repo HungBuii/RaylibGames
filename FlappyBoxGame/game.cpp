@@ -12,6 +12,8 @@ typedef struct RSphere
 // Obstacle Object (Water Pipe)
 typedef struct Obstacle
 {
+    Rectangle rec;
+    Color color;
 } WaterPipe;
 
 // Global Variables Declaration
@@ -19,6 +21,7 @@ static const int screenWidth = 800;
 static const int screenHeight = 450;
 
 static Flappy flappy;
+static WaterPipe waterpipe;
 
 // Module Functions Declaration (local)
 static void InitGame(); // Initialize game
@@ -39,6 +42,12 @@ void InitGame()
     flappy.radius = 30;
     flappy.color = BLUE;
     flappy.position = (Vector2){80, screenHeight / 2};
+
+    waterpipe.rec.x = 400;
+    waterpipe.rec.y = 0;
+    waterpipe.rec.width = 80;
+    waterpipe.rec.height = 200;
+    waterpipe.color = GREEN;
 }
 
 void DrawGame()
@@ -48,6 +57,10 @@ void DrawGame()
 
     // Round Sphere (Main character)
     DrawCircle(flappy.position.x, flappy.position.y, flappy.radius, flappy.color);
+
+    // Rectangle Water Pipe
+    DrawRectangle(waterpipe.rec.x, waterpipe.rec.y, waterpipe.rec.width, waterpipe.rec.height, waterpipe.color);
+    DrawRectangle(waterpipe.rec.x, waterpipe.rec.height + waterpipe.rec.y + flappy.radius * 2 + 40, waterpipe.rec.width, waterpipe.rec.height, waterpipe.color);
 }
 
 int main()
