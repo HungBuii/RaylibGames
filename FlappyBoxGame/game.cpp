@@ -2,9 +2,9 @@
 #include "raylib.h"
 
 // Define value
-#define MAX_PIPES 6 // Count Water Pipe <= Count Water Pipe / 2 && Count Water Pipe >= 2
+#define MAX_PIPES 100 // Count Water Pipe <= Count Water Pipe / 2 && Count Water Pipe >= 2
 #define WPWidth 80
-#define WPHeight 200
+#define WPHeight 300
 #define RADIUS 30
 
 // Round Sphere Object (Main character - Flappy)
@@ -28,15 +28,19 @@ static const int screenHeight = 450;
 
 static Flappy flappy;
 static WP wp[MAX_PIPES] = {0};
+static Vector2 wpPos[MAX_PIPES] = {0};
+
+static int speedX = 0;
 
 // Module Functions Declaration (local)
 static void InitGame(); // Initialize game
 static void DrawGame(); // Draw game (one frame)
-
-static Vector2 wpPos[MAX_PIPES] = {0};
+static void UpdateGame();
 
 void InitGame()
 {
+    speedX = 2;
+
     flappy.radius = RADIUS;
     flappy.color = BLUE;
     flappy.position = (Vector2){80, screenHeight / 2};
@@ -44,7 +48,7 @@ void InitGame()
     for (int i = 0; i < MAX_PIPES; i++)
     {
         wpPos[i].x = 400 + 250 * i;
-        wpPos[i].y = GetRandomValue(-50, 0);
+        wpPos[i].y = GetRandomValue(-150, 0);
     }
 
     for (int i = 0; i < MAX_PIPES; i += 2)
@@ -63,6 +67,8 @@ void InitGame()
 
 void DrawGame()
 {
+    BeginDrawing();
+
     // Background
     ClearBackground(WHITE);
 
@@ -74,6 +80,22 @@ void DrawGame()
         DrawRectangle(wp[i].rec.x, wp[i].rec.y, wp[i].rec.width, wp[i].rec.height, GREEN);
         DrawRectangle(wp[i + 1].rec.x, wp[i + 1].rec.y, wp[i + 1].rec.width, wp[i + 1].rec.height, GREEN);
     }
+
+    EndDrawing();
+}
+
+void UpdateGame()
+{
+    for (int i = 0; i < MAX_PIPES; i++)
+    {
+        wpPos[i].x -= speedX;
+    }
+
+    for (int i = 0; i < MAX_PIPES; i += 2)
+    {
+        wp[i].rec.x = wpPos[i / 2].x;
+        wp[i + 1].rec.x = wpPos[i / 2].x;
+    }
 }
 
 int main()
@@ -82,13 +104,13 @@ int main()
 
     InitGame();
 
+    SetTargetFPS(60);
+
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        BeginDrawing();
+        UpdateGame();
 
         DrawGame();
-
-        EndDrawing();
     }
 
     return 0;
