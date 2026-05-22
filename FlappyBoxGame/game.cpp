@@ -33,9 +33,10 @@ static Vector2 wpPos[MAX_PIPES] = {0};
 static int speedX = 0;
 
 // Module Functions Declaration (local)
-static void InitGame(); // Initialize game
-static void DrawGame(); // Draw game (one frame)
-static void UpdateGame();
+static void InitGame();        // Initialize game
+static void DrawGame();        // Draw game (one frame)
+static void UpdateGame();      // Update game (one frame)
+static void UpdateDrawFrame(); // Update and Draw
 
 void InitGame()
 {
@@ -98,6 +99,12 @@ void UpdateGame()
     }
 }
 
+void UpdateDrawFrame()
+{
+    UpdateGame();
+    DrawGame();
+}
+
 int main()
 {
     InitWindow(screenWidth, screenHeight, "classic game: floppy");
@@ -108,9 +115,7 @@ int main()
 
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        UpdateGame();
-
-        DrawGame();
+        UpdateDrawFrame();
     }
 
     return 0;
