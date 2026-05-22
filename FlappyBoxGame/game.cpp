@@ -37,6 +37,7 @@ static void InitGame();        // Initialize game
 static void DrawGame();        // Draw game (one frame)
 static void UpdateGame();      // Update game (one frame)
 static void UpdateDrawFrame(); // Update and Draw
+static void ShowFPS();         // Show FPS on screen
 
 void InitGame()
 {
@@ -105,6 +106,11 @@ void UpdateDrawFrame()
     DrawGame();
 }
 
+void ShowFPS()
+{
+    DrawFPS(0, 10);
+}
+
 int main()
 {
     InitWindow(screenWidth, screenHeight, "classic game: floppy");
@@ -115,6 +121,8 @@ int main()
 
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
+        ShowFPS();
+
         UpdateDrawFrame();
     }
 
