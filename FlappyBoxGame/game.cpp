@@ -39,17 +39,25 @@ static void UpdateGame();      // Update game (one frame)
 static void UpdateDrawFrame(); // Update and Draw
 static void ShowFPS();         // Show FPS on screen
 
-void InitGame()
-{
-    speedX = 2;
+// Logic Functions Declaration
+void FlappyInfo();
+void WaterPipeLocation();
+void FlappyMovement();
+void WaterPipeAnimation();
 
+// Logic Functions Init
+void FlappyInfo()
+{
     flappy.radius = RADIUS;
     flappy.color = BLUE;
     flappy.position = (Vector2){80, screenHeight / 2};
+}
 
+void WaterPipeLocation()
+{
     for (int i = 0; i < MAX_PIPES; i++)
     {
-        wpPos[i].x = 400 + 250 * i;
+        wpPos[i].x = 450 + 250 * i;
         wpPos[i].y = GetRandomValue(-150, 0);
     }
 
@@ -67,6 +75,39 @@ void InitGame()
     }
 }
 
+void FlappyMovement()
+{
+    flappy.position.y += 1;
+    if (IsKeyDown(KEY_SPACE))
+    {
+        flappy.position.y -= 3;
+    }
+}
+
+void WaterPipeAnimation()
+{
+    speedX = 2;
+
+    for (int i = 0; i < MAX_PIPES; i++)
+    {
+        wpPos[i].x -= speedX;
+    }
+
+    for (int i = 0; i < MAX_PIPES; i += 2)
+    {
+        wp[i].rec.x = wpPos[i / 2].x;
+        wp[i + 1].rec.x = wpPos[i / 2].x;
+    }
+}
+
+// Module Functions Init (local)
+void InitGame()
+{
+    FlappyInfo();
+
+    WaterPipeLocation();
+}
+
 void DrawGame()
 {
     BeginDrawing();
@@ -77,6 +118,7 @@ void DrawGame()
     // Round Sphere (Main character)
     DrawCircle(flappy.position.x, flappy.position.y, flappy.radius, flappy.color);
 
+    // Water Pipe
     for (int i = 0; i < MAX_PIPES; i += 2)
     {
         DrawRectangle(wp[i].rec.x, wp[i].rec.y, wp[i].rec.width, wp[i].rec.height, GREEN);
@@ -88,16 +130,9 @@ void DrawGame()
 
 void UpdateGame()
 {
-    for (int i = 0; i < MAX_PIPES; i++)
-    {
-        wpPos[i].x -= speedX;
-    }
+    FlappyMovement();
 
-    for (int i = 0; i < MAX_PIPES; i += 2)
-    {
-        wp[i].rec.x = wpPos[i / 2].x;
-        wp[i + 1].rec.x = wpPos[i / 2].x;
-    }
+    WaterPipeAnimation();
 }
 
 void UpdateDrawFrame()
