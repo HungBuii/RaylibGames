@@ -44,6 +44,7 @@ void FlappyInfo();
 void WaterPipeLocation();
 void FlappyMovement();
 void WaterPipeAnimation();
+void CheckCollision();
 
 // Logic Functions Init
 void FlappyInfo()
@@ -100,6 +101,16 @@ void WaterPipeAnimation()
     }
 }
 
+void CheckCollision()
+{
+    for (int i = 0; i < MAX_PIPES; i++)
+    {
+        bool temp = CheckCollisionCircleRec(flappy.position, flappy.radius, wp[i].rec);
+        if (temp)
+            std::cout << "Collision!";
+    }
+}
+
 // Module Functions Init (local)
 void InitGame()
 {
@@ -133,6 +144,8 @@ void UpdateGame()
     FlappyMovement();
 
     WaterPipeAnimation();
+
+    CheckCollision();
 }
 
 void UpdateDrawFrame()
