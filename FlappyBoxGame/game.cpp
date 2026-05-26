@@ -35,6 +35,7 @@ static int score = 0;
 static int hiScore = 0;
 static float speedX = 0.f;
 static bool gameOver = false;
+static bool gamePause = false;
 
 // Module Functions Declaration (local)
 static void InitGame();        // Initialize game
@@ -140,6 +141,7 @@ void InitGame()
     WaterPipeLocation();
 
     score = 0;
+    gamePause = false;
 }
 
 void DrawGame()
@@ -153,6 +155,11 @@ void DrawGame()
     {
         char textGameOver[] = "Game Over! Press [ENTER] To Play Again";
         DrawText(textGameOver, GetScreenWidth() / 2 - MeasureText(textGameOver, 20) / 2, GetScreenHeight() / 2 - 50, 20, GRAY);
+    }
+    else if (gamePause)
+    {
+        char textGamePause[] = "Pause Game! Press [P] To Continue";
+        DrawText(textGamePause, GetScreenWidth() / 2 - MeasureText(textGamePause, 20) / 2, GetScreenHeight() / 2 - 50, 20, GRAY);
     }
     else
     {
@@ -177,11 +184,19 @@ void UpdateGame()
 {
     if (!gameOver)
     {
-        FlappyMovement();
+        if (IsKeyPressed(KEY_P))
+        {
+            gamePause = !gamePause;
+        }
 
-        WaterPipeAnimation();
+        if (!gamePause)
+        {
+            FlappyMovement();
 
-        CheckCollision();
+            WaterPipeAnimation();
+
+            CheckCollision();
+        }
     }
     else
     {
