@@ -2,7 +2,7 @@
 #include "raylib.h"
 
 // Define value
-#define MAX_PIPES 100 // Count Water Pipe <= Count Water Pipe / 2 && Count Water Pipe >= 2
+#define MAX_PIPES 100 // Count Water Pipe = Count Water Pipe / 2 && Count Water Pipe >= 2
 #define WPWidth 80
 #define WPHeight 300
 #define RADIUS 30
@@ -33,7 +33,7 @@ static Vector2 wpPos[MAX_PIPES] = {0};
 
 static int score = 0;
 static int hiScore = 0;
-static int speedX = 0;
+static float speedX = 0.f;
 static bool gameOver = false;
 
 // Module Functions Declaration (local)
@@ -62,7 +62,7 @@ void WaterPipeLocation()
 {
     for (int i = 0; i < MAX_PIPES; i++)
     {
-        wpPos[i].x = 450 + 250 * i;
+        wpPos[i].x = 450 + 300 * i;
         wpPos[i].y = GetRandomValue(-150, 0);
     }
 
@@ -84,20 +84,23 @@ void WaterPipeLocation()
 
 void FlappyMovement()
 {
-    flappy.position.y += 1;
+    flappy.position.y += 1.5f;
     if (IsKeyDown(KEY_SPACE))
-    {
         flappy.position.y -= 3;
-    }
 }
 
 void WaterPipeAnimation()
 {
-    speedX = 2;
+    speedX = 2.f;
 
     for (int i = 0; i < MAX_PIPES; i++)
     {
         wpPos[i].x -= speedX;
+
+        if (score >= 300 && score < 500)
+            speedX = 2.3f;
+        if (score >= 500)
+            speedX = 2.5f;
     }
 
     for (int i = 0; i < MAX_PIPES; i += 2)
