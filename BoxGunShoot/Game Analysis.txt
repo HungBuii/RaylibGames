@@ -6,7 +6,9 @@ II. Các đối tượng trong game
 - Kích thước: hình chữ nhật 
 - Trang bị: đạn 
 - Cơ chế hoạt động: 
-    + Di chuyển: trên, dưới, trái, phải
+    + Di chuyển: 
+        + trên, dưới, trái, phải
+        + khi di chuyển sang hết bên trái, phải, trên, dưới thì vẫn ở trong màn hình game
     + bắn ra viên đạn hình vuông vào "địch"
 
 2. Box Alien (Enemy)
