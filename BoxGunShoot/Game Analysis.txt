@@ -2,6 +2,30 @@ I. Kích thước màn hình Game
 - Kích thước: 1280 x 720 (HD)
 
 II. Các đối tượng trong game
+1. Box Hero (Main character)
+- Kích thước: hình chữ nhật 
+- Trang bị: đạn 
+- Cơ chế hoạt động: 
+    + Di chuyển: trên, dưới, trái, phải
+    + bắn ra viên đạn hình vuông vào "địch"
 
+2. Box Alien (Enemy)
+- Kích thước: hình chữ nhật nhưng bé hơn "Box Hero"
+- Cơ chế hoạt động: 
+    + Di chuyển: spawn ở vị trí phải màn hình và random vị trí
 
 III. Gameplay
+- "Box Hero" bắn ra "đạn" -> "đạn" trúng vào "enemy" thì sẽ bị tiêu diệt (biến mất)
+    + Mỗi lần trúng 1 "enemy" -> +100 điểm
+
+- "Box Hero" chạm vào "enemy" -> game over
+
+- Số lượng spawn "enemy" ở các vòng chơi như nhau
+
+- Có 3 vòng chơi
+    + Vòng 1: 
+        + đạt 500 điểm -> qua màn
+    + Vòng 2: 
+        + đạt 1000 điểm -> qua màn
+    + Vòng 3:
+        + đạt 1500 điểm -> qua màn
