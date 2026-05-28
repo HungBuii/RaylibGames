@@ -1,7 +1,7 @@
 #include "iostream"
 #include "raylib.h"
 
-#define NUM_BULLET 10
+#define NUM_BULLET 50
 
 // Spaceship (main character)
 struct Spaceship
@@ -11,11 +11,23 @@ struct Spaceship
     Color color;
 };
 
+// Bullet
+struct Bullet
+{
+    Rectangle rec;
+    Vector2 speed;
+    Color color;
+    bool active;
+};
+
 // Global Variables Declaration
 static const int screenWidth = 800;
 static const int screenHeight = 450;
 
 static Spaceship spaceship;
+
+static Bullet bullet[NUM_BULLET];
+static int shootRate = 0;
 
 // Module Functions Declaration
 static void ShowFPS();         // Show FPS on screen
@@ -27,6 +39,7 @@ static void UpdateDrawFrame(); // Update and Draw
 // Logic Functions Declaration
 static void MoveButton();
 static void Movement();
+static void Fire();
 
 // Logic Functions Init
 void MoveButton()
@@ -53,10 +66,43 @@ void Movement()
         spaceship.rec.y = screenHeight - spaceship.rec.height;
 }
 
+void Fire()
+{
+    if (IsKeyDown(KEY_SPACE))
+    {
+        shootRate += 5;
+
+        for (int i = 0; i < NUM_BULLET; i++)
+        {
+            if (!bullet[i].active && shootRate % 20 == 0)
+            {
+                bullet[i].rec.x = spaceship.rec.x + spaceship.rec.width;
+                bullet[i].rec.y = spaceship.rec.y + spaceship.rec.height / 4;
+                bullet[i].active = true;
+                break;
+            }
+        }
+    }
+
+    for (int i = 0; i < NUM_BULLET; i++)
+    {
+        if (bullet[i].active)
+        {
+            bullet[i].rec.x += bullet[i].speed.x;
+
+            if (bullet[i].rec.x + bullet[i].rec.width >= screenWidth)
+            {
+                bullet[i].active = false;
+                // shootRate = 0;
+            }
+        }
+    }
+}
+
 // Module Functions Init
 void InitGame()
 {
-    // Init spaceship object
+    // Init spaceship
     spaceship.rec.x = 20;
     spaceship.rec.y = 50;
     spaceship.rec.width = 40;
@@ -64,6 +110,20 @@ void InitGame()
     spaceship.speed.x = 5;
     spaceship.speed.y = 5;
     spaceship.color = BLUE;
+
+    // Init bullet
+    shootRate = 0;
+    for (int i = 0; i < NUM_BULLET; i++)
+    {
+        // bullet[i].rec.x = spaceship.rec.x + spaceship.rec.width;
+        // bullet[i].rec.y = spaceship.rec.y + spaceship.rec.height / 4;
+        bullet[i].rec.width = spaceship.rec.width / 2;
+        bullet[i].rec.height = spaceship.rec.height / 2;
+        bullet[i].speed.x = 7;
+        bullet[i].speed.y = 0;
+        bullet[i].color = RED;
+        bullet[i].active = false;
+    }
 }
 
 void DrawGame()
@@ -74,7 +134,13 @@ void DrawGame()
     ClearBackground(WHITE);
 
     // Draw objects
-    DrawRectangle(spaceship.rec.x, spaceship.rec.y, spaceship.rec.width, spaceship.rec.height, spaceship.color); // Main ship
+    DrawRectangleRec(spaceship.rec, spaceship.color); // Main ship
+
+    for (int i = 0; i < NUM_BULLET; i++)
+    {
+        if (bullet[i].active)
+            DrawRectangleRec(bullet[i].rec, bullet[i].color);
+    }
 
     // DrawRectangle(50, 50, 40, 20, BLUE);  // Main ship
     // DrawRectangle(100, 50, 20, 10, BLUE); // Bullet
@@ -89,12 +155,14 @@ void UpdateGame()
     MoveButton();
     Movement();
 
-    //
+    // Fire
+    Fire();
 }
 
 void UpdateDrawFrame()
 {
     UpdateGame();
+
     DrawGame();
 }
 
