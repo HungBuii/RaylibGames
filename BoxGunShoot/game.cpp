@@ -93,7 +93,7 @@ void Fire()
             if (bullet[i].rec.x + bullet[i].rec.width >= screenWidth)
             {
                 bullet[i].active = false;
-                // shootRate = 0;
+                shootRate = 0; // reload bullet
             }
         }
     }
