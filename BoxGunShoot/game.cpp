@@ -1,6 +1,8 @@
 #include "iostream"
 #include "raylib.h"
 
+#define NUM_BULLET 10
+
 // Spaceship (main character)
 struct Spaceship
 {
@@ -24,6 +26,7 @@ static void UpdateDrawFrame(); // Update and Draw
 
 // Logic Functions Declaration
 static void MoveButton();
+static void Movement();
 
 // Logic Functions Init
 void MoveButton()
@@ -36,6 +39,18 @@ void MoveButton()
         spaceship.rec.x -= spaceship.speed.x;
     if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
         spaceship.rec.x += spaceship.speed.x;
+}
+
+void Movement()
+{
+    if (spaceship.rec.x <= 0)
+        spaceship.rec.x = 0;
+    if (spaceship.rec.x >= screenWidth - spaceship.rec.width)
+        spaceship.rec.x = screenWidth - spaceship.rec.width;
+    if (spaceship.rec.y <= 0)
+        spaceship.rec.y = 0;
+    if (spaceship.rec.y >= screenHeight - spaceship.rec.height)
+        spaceship.rec.y = screenHeight - spaceship.rec.height;
 }
 
 // Module Functions Init
@@ -72,6 +87,9 @@ void UpdateGame()
 {
     // Spaceship movement
     MoveButton();
+    Movement();
+
+    //
 }
 
 void UpdateDrawFrame()
