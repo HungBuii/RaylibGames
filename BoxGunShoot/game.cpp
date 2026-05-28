@@ -115,8 +115,8 @@ void InitGame()
     shootRate = 0;
     for (int i = 0; i < NUM_BULLET; i++)
     {
-        // bullet[i].rec.x = spaceship.rec.x + spaceship.rec.width;
-        // bullet[i].rec.y = spaceship.rec.y + spaceship.rec.height / 4;
+        bullet[i].rec.x = spaceship.rec.x + spaceship.rec.width;
+        bullet[i].rec.y = spaceship.rec.y + spaceship.rec.height / 4;
         bullet[i].rec.width = spaceship.rec.width / 2;
         bullet[i].rec.height = spaceship.rec.height / 2;
         bullet[i].speed.x = 7;
