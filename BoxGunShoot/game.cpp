@@ -51,6 +51,7 @@ static void UpdateDrawFrame(); // Update and Draw
 static void MoveButton();
 static void Movement();
 static void Fire();
+static void EnemyMovement();
 
 // Logic Functions Init
 void MoveButton()
@@ -110,6 +111,19 @@ void Fire()
     }
 }
 
+void EnemyMovement()
+{
+    for (int i = 0; i < NUM_ENEMY; i++)
+    {
+        enemyship[i].rec.x -= enemyship[i].speed.x;
+        if (enemyship[i].rec.x < 0)
+        {
+            enemyship[i].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);
+            enemyship[i].rec.y = GetRandomValue(0, screenHeight - enemyship[i].rec.height);
+        }
+    }
+}
+
 // Module Functions Init
 void InitGame()
 {
@@ -141,7 +155,7 @@ void InitGame()
     {
         enemyship[i].rec.width = spaceship.rec.width / 2;
         enemyship[i].rec.height = 15;
-        enemyship[i].rec.x = GetRandomValue(0, screenWidth);
+        enemyship[i].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);
         enemyship[i].rec.y = GetRandomValue(0, screenHeight - enemyship[i].rec.height);
         enemyship[i].speed.x = 5;
         enemyship[i].speed.y = 0;
@@ -167,7 +181,7 @@ void DrawGame()
 
     for (int i = 0; i < NUM_ENEMY; i++)
     {
-        DrawRectangleRec(enemyship[i].rec, enemyship[i].color);
+        DrawRectangleRec(enemyship[i].rec, enemyship[i].color); // Enemy ship
     }
 
     EndDrawing();
@@ -181,6 +195,9 @@ void UpdateGame()
 
     // Fire
     Fire();
+
+    // Enemy movement
+    EnemyMovement();
 }
 
 void UpdateDrawFrame()
