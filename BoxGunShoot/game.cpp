@@ -2,6 +2,7 @@
 #include "raylib.h"
 
 #define NUM_BULLET 50
+#define NUM_ENEMY 50
 
 // Spaceship (main character)
 struct Spaceship
@@ -20,6 +21,14 @@ struct Bullet
     bool active;
 };
 
+// Enemy
+struct Enemyship
+{
+    Rectangle rec;
+    Vector2 speed;
+    Color color;
+};
+
 // Global Variables Declaration
 static const int screenWidth = 800;
 static const int screenHeight = 450;
@@ -27,7 +36,9 @@ static const int screenHeight = 450;
 static Spaceship spaceship;
 
 static Bullet bullet[NUM_BULLET];
-static int shootRate = 0;
+static int shootRate = 0; // Used to prevent "bullets" from being fired continuously.
+
+static Enemyship enemyship[NUM_ENEMY];
 
 // Module Functions Declaration
 static void ShowFPS();         // Show FPS on screen
@@ -124,6 +135,18 @@ void InitGame()
         bullet[i].color = RED;
         bullet[i].active = false;
     }
+
+    // Init enemyship
+    for (int i = 0; i < NUM_ENEMY; i++)
+    {
+        enemyship[i].rec.width = spaceship.rec.width / 2;
+        enemyship[i].rec.height = 15;
+        enemyship[i].rec.x = GetRandomValue(0, screenWidth);
+        enemyship[i].rec.y = GetRandomValue(0, screenHeight - enemyship[i].rec.height);
+        enemyship[i].speed.x = 5;
+        enemyship[i].speed.y = 0;
+        enemyship[i].color = GREEN;
+    }
 }
 
 void DrawGame()
@@ -139,12 +162,13 @@ void DrawGame()
     for (int i = 0; i < NUM_BULLET; i++)
     {
         if (bullet[i].active)
-            DrawRectangleRec(bullet[i].rec, bullet[i].color);
+            DrawRectangleRec(bullet[i].rec, bullet[i].color); // Bullet
     }
 
-    // DrawRectangle(50, 50, 40, 20, BLUE);  // Main ship
-    // DrawRectangle(100, 50, 20, 10, BLUE); // Bullet
-    // DrawRectangle(50, 100, 20, 20, BLUE); // Enemy
+    for (int i = 0; i < NUM_ENEMY; i++)
+    {
+        DrawRectangleRec(enemyship[i].rec, enemyship[i].color);
+    }
 
     EndDrawing();
 }
