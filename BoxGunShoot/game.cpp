@@ -40,6 +40,8 @@ static int shootRate = 0; // Used to prevent "bullets" from being fired continuo
 
 static Enemyship enemyship[NUM_ENEMY];
 
+static int score = 0;
+
 // Module Functions Declaration
 static void ShowFPS();         // Show FPS on screen
 static void InitGame();        // Initialize game
@@ -52,6 +54,7 @@ static void MoveButton();
 static void Movement();
 static void Fire();
 static void EnemyMovement();
+static void CheckCollision();
 
 // Logic Functions Init
 void MoveButton()
@@ -124,6 +127,24 @@ void EnemyMovement()
     }
 }
 
+void CheckCollision()
+{
+    // Enemy ship vs Bullet
+    for (int i = 0; i < NUM_ENEMY; i++)
+    {
+        for (int j = 0; j < NUM_BULLET; j++)
+        {
+            if (bullet[j].active && CheckCollisionRecs(enemyship[i].rec, bullet[j].rec))
+            {
+                score += 100;
+                bullet[j].active = false;
+                enemyship[i].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);
+                enemyship[i].rec.y = GetRandomValue(0, screenHeight - enemyship[i].rec.height);
+            }
+        }
+    }
+}
+
 // Module Functions Init
 void InitGame()
 {
@@ -184,6 +205,9 @@ void DrawGame()
         DrawRectangleRec(enemyship[i].rec, enemyship[i].color); // Enemy ship
     }
 
+    // Score
+    DrawText(TextFormat("%04i", score), 5, 40, 30, RED);
+
     EndDrawing();
 }
 
@@ -198,6 +222,9 @@ void UpdateGame()
 
     // Enemy movement
     EnemyMovement();
+
+    // Check collision
+    CheckCollision();
 }
 
 void UpdateDrawFrame()
