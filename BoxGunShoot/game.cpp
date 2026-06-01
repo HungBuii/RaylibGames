@@ -42,6 +42,8 @@ static Enemyship enemyship[NUM_ENEMY];
 
 static int score = 0;
 
+static bool gameOver = false;
+
 // Module Functions Declaration
 static void ShowFPS();         // Show FPS on screen
 static void InitGame();        // Initialize game
@@ -129,9 +131,17 @@ void EnemyMovement()
 
 void CheckCollision()
 {
-    // Enemy ship vs Bullet
+
     for (int i = 0; i < NUM_ENEMY; i++)
     {
+        // Enemy ship vs Space ship
+        if (CheckCollisionRecs(enemyship[i].rec, spaceship.rec))
+        {
+            gameOver = true;
+            break;
+        }
+
+        // Enemy ship vs Bullet
         for (int j = 0; j < NUM_BULLET; j++)
         {
             if (bullet[j].active && CheckCollisionRecs(enemyship[i].rec, bullet[j].rec))
@@ -148,6 +158,11 @@ void CheckCollision()
 // Module Functions Init
 void InitGame()
 {
+    // Init variables
+    score = 0;
+    gameOver = false;
+    shootRate = 0;
+
     // Init spaceship
     spaceship.rec.x = 20;
     spaceship.rec.y = 50;
@@ -191,40 +206,60 @@ void DrawGame()
     // Background
     ClearBackground(WHITE);
 
-    // Draw objects
-    DrawRectangleRec(spaceship.rec, spaceship.color); // Main ship
-
-    for (int i = 0; i < NUM_BULLET; i++)
+    // Check Game Over
+    if (!gameOver)
     {
-        if (bullet[i].active)
-            DrawRectangleRec(bullet[i].rec, bullet[i].color); // Bullet
-    }
+        // Draw objects
+        DrawRectangleRec(spaceship.rec, spaceship.color); // Main ship
 
-    for (int i = 0; i < NUM_ENEMY; i++)
+        for (int i = 0; i < NUM_BULLET; i++)
+        {
+            if (bullet[i].active)
+                DrawRectangleRec(bullet[i].rec, bullet[i].color); // Bullet
+        }
+
+        for (int i = 0; i < NUM_ENEMY; i++)
+        {
+            DrawRectangleRec(enemyship[i].rec, enemyship[i].color); // Enemy ship
+        }
+
+        // Score
+        DrawText(TextFormat("%04i", score), 5, 40, 30, RED);
+    }
+    else
     {
-        DrawRectangleRec(enemyship[i].rec, enemyship[i].color); // Enemy ship
+        char textGameOver[] = "Game Over! Press [ENTER] To Play Again";
+        DrawText(textGameOver, GetScreenWidth() / 2 - MeasureText(textGameOver, 20) / 2, GetScreenHeight() / 2 - 50, 20, GRAY);
     }
-
-    // Score
-    DrawText(TextFormat("%04i", score), 5, 40, 30, RED);
 
     EndDrawing();
 }
 
 void UpdateGame()
 {
-    // Spaceship movement
-    MoveButton();
-    Movement();
+    if (!gameOver)
+    {
+        // Spaceship movement
+        MoveButton();
+        Movement();
 
-    // Fire
-    Fire();
+        // Fire
+        Fire();
 
-    // Enemy movement
-    EnemyMovement();
+        // Enemy movement
+        EnemyMovement();
 
-    // Check collision
-    CheckCollision();
+        // Check collision
+        CheckCollision();
+    }
+    else
+    {
+        if (IsKeyPressed(KEY_ENTER))
+        {
+            gameOver = false;
+            InitGame();
+        }
+    }
 }
 
 void UpdateDrawFrame()
