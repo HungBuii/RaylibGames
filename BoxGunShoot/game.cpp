@@ -3,6 +3,17 @@
 
 #define NUM_BULLET 50
 #define NUM_ENEMY 50
+#define NUM_ENEMY_ROUND_1 5
+#define NUM_ENEMY_ROUND_2 10
+#define NUM_ENEMY_ROUND_3 15
+
+// Enum "Round"
+enum Round
+{
+    Round1,
+    Round2,
+    Round3
+};
 
 // Spaceship (main character)
 struct Spaceship
@@ -41,8 +52,15 @@ static int shootRate = 0; // Used to prevent "bullets" from being fired continuo
 static Enemyship enemyship[NUM_ENEMY];
 
 static int score = 0;
+static int enemyKilled = 0;
+static int enemyEliminate = 0;
 
 static bool gameOver = false;
+static bool gameWin = false;
+
+static float alpha = 0.f;
+static bool textVisible = false;
+static Round round;
 
 // Module Functions Declaration
 static void ShowFPS();         // Show FPS on screen
@@ -146,6 +164,7 @@ void CheckCollision()
         {
             if (bullet[j].active && CheckCollisionRecs(enemyship[i].rec, bullet[j].rec))
             {
+                enemyKilled++;
                 score += 100;
                 bullet[j].active = false;
                 enemyship[i].rec.x = GetRandomValue(screenWidth, screenWidth + 1000);
@@ -162,6 +181,12 @@ void InitGame()
     score = 0;
     gameOver = false;
     shootRate = 0;
+    round = Round1;
+    alpha = 0.f;
+    textVisible = false;
+    enemyKilled = 0;
+    enemyEliminate = NUM_ENEMY_ROUND_1;
+    gameWin = false;
 
     // Init spaceship
     spaceship.rec.x = 20;
@@ -209,27 +234,70 @@ void DrawGame()
     // Check Game Over
     if (!gameOver)
     {
-        // Draw objects
-        DrawRectangleRec(spaceship.rec, spaceship.color); // Main ship
-
-        for (int i = 0; i < NUM_BULLET; i++)
+        if (gameWin)
         {
-            if (bullet[i].active)
-                DrawRectangleRec(bullet[i].rec, bullet[i].color); // Bullet
-        }
+            char textGameWin[] = "Win Game! Press [ENTER] To Play Again";
+            DrawText(textGameWin, GetScreenWidth() / 2 - MeasureText(textGameWin, 20) / 2, GetScreenHeight() / 2 - 40, 20, GRAY);
 
-        for (int i = 0; i < NUM_ENEMY; i++)
+            char textEnemyKilled[] = "Enemy Killed :";
+            int posXTextEnemyKilled = GetScreenWidth() / 2 - MeasureText(textEnemyKilled, 20) / 2;
+            int posYTextEnemyKilled = GetScreenHeight() / 2 - 40 + 30;
+            DrawText(textEnemyKilled, posXTextEnemyKilled, posYTextEnemyKilled, 20, GRAY);
+
+            DrawText(TextFormat("%01i", enemyKilled), posXTextEnemyKilled + 150, posYTextEnemyKilled, 20, GRAY);
+
+            char textScore[] = "Score :";
+            int posXTextScore = GetScreenWidth() / 2 - MeasureText(textEnemyKilled, 20) / 2;
+            int posYTextScore = GetScreenHeight() / 2 - 40 + 60;
+            DrawText(textScore, posXTextScore, posYTextScore, 20, GRAY);
+
+            DrawText(TextFormat("%01i", score), posXTextScore + 100, posYTextScore, 20, GRAY);
+        }
+        else
         {
-            DrawRectangleRec(enemyship[i].rec, enemyship[i].color); // Enemy ship
-        }
+            // Draw objects
+            DrawRectangleRec(spaceship.rec, spaceship.color); // Main ship
 
-        // Score
-        DrawText(TextFormat("%04i", score), 5, 40, 30, RED);
+            for (int i = 0; i < NUM_BULLET; i++)
+            {
+                if (bullet[i].active)
+                    DrawRectangleRec(bullet[i].rec, bullet[i].color); // Bullet
+            }
+
+            for (int i = 0; i < NUM_ENEMY; i++)
+            {
+                DrawRectangleRec(enemyship[i].rec, enemyship[i].color); // Enemy ship
+            }
+
+            // Score
+            DrawText(TextFormat("%04i", score), 5, 40, 30, RED);
+
+            // Text each "Round"
+            if (round == Round1)
+            {
+                DrawText("Round 1", GetScreenWidth() / 2 - MeasureText("Round 1", 40) / 2, GetScreenHeight() / 2 - 40, 40, Fade(GRAY, alpha));
+            }
+            if (round == Round2)
+            {
+                DrawText("Round 2", GetScreenWidth() / 2 - MeasureText("Round 2", 40) / 2, GetScreenHeight() / 2 - 40, 40, Fade(GRAY, alpha));
+            }
+            if (round == Round3)
+            {
+                DrawText("Round 3", GetScreenWidth() / 2 - MeasureText("Round 3", 40) / 2, GetScreenHeight() / 2 - 40, 40, Fade(GRAY, alpha));
+            }
+        }
     }
     else
     {
         char textGameOver[] = "Game Over! Press [ENTER] To Play Again";
-        DrawText(textGameOver, GetScreenWidth() / 2 - MeasureText(textGameOver, 20) / 2, GetScreenHeight() / 2 - 50, 20, GRAY);
+        DrawText(textGameOver, GetScreenWidth() / 2 - MeasureText(textGameOver, 20) / 2, GetScreenHeight() / 2 - 40, 20, GRAY);
+
+        char textEnemyKilled[] = "Enemy Killed :";
+        int posXTextEnemyKilled = GetScreenWidth() / 2 - MeasureText(textEnemyKilled, 20) / 2;
+        int posYTextEnemyKilled = GetScreenHeight() / 2 - 40 + 30;
+        DrawText(textEnemyKilled, posXTextEnemyKilled, posYTextEnemyKilled, 20, GRAY);
+
+        DrawText(TextFormat("%01i", enemyKilled), posXTextEnemyKilled + 150, posYTextEnemyKilled, 20, GRAY);
     }
 
     EndDrawing();
@@ -239,24 +307,109 @@ void UpdateGame()
 {
     if (!gameOver)
     {
-        // Spaceship movement
-        MoveButton();
-        Movement();
+        if (!gameWin)
+        {
+            // Spaceship movement
+            MoveButton();
+            Movement();
 
-        // Fire
-        Fire();
+            // Fire
+            Fire();
 
-        // Enemy movement
-        EnemyMovement();
+            // Enemy movement
+            EnemyMovement();
 
-        // Check collision
-        CheckCollision();
+            // Check collision
+            CheckCollision();
+
+            // The effect of the text across each "round"
+            switch (round)
+            {
+            case Round1:
+
+                if (!textVisible)
+                {
+                    alpha += 0.02f;
+
+                    if (alpha >= 1.f)
+                        textVisible = true;
+                }
+                if (textVisible)
+                {
+                    alpha -= 0.02f;
+                }
+                if (enemyKilled == enemyEliminate)
+                {
+                    textVisible = false;
+                    round = Round2;
+                    alpha = 0.f;
+                    enemyEliminate = NUM_ENEMY_ROUND_2;
+                }
+
+                break;
+
+            case Round2:
+
+                if (!textVisible)
+                {
+                    alpha += 0.02f;
+
+                    if (alpha >= 1.f)
+                        textVisible = true;
+                }
+                if (textVisible)
+                {
+                    alpha -= 0.02f;
+                }
+                if (enemyKilled >= enemyEliminate) // must ">=" replace "==" because when the score is increased suddenly, the system will not be able to check the conditions in time.
+                {
+                    textVisible = false;
+                    round = Round3;
+                    alpha = 0.f;
+                    enemyEliminate = NUM_ENEMY_ROUND_3;
+                }
+
+                break;
+
+            case Round3:
+
+                if (!textVisible)
+                {
+                    alpha += 0.02f;
+
+                    if (alpha >= 1.f)
+                        textVisible = true;
+                }
+                if (textVisible)
+                {
+                    alpha -= 0.02f;
+                }
+                if (enemyKilled == enemyEliminate)
+                {
+                    gameWin = true;
+                }
+
+                break;
+
+            default:
+                break;
+            }
+        }
     }
     else
     {
         if (IsKeyPressed(KEY_ENTER))
         {
             gameOver = false;
+            InitGame();
+        }
+    }
+
+    if (gameWin)
+    {
+        if (IsKeyPressed(KEY_ENTER))
+        {
+            gameWin = false;
             InitGame();
         }
     }
