@@ -40,6 +40,7 @@ void InitGame()
     snake_length = 1;
     snake.position = (Vector2){offset.x / 2, offset.y / 2};
     snake.size = {SIZE_SQUARE, SIZE_SQUARE};
+    snake.color = DARKBLUE;
 }
 
 void DrawGame()
@@ -68,7 +69,7 @@ void DrawGame()
     }
 
     // Snake
-    DrawRectangleV(snake.position, snake.size, DARKBLUE);
+    DrawRectangleV(snake.position, snake.size, snake.color);
 
     EndDrawing();
 }
