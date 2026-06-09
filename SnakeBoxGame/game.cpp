@@ -17,6 +17,8 @@ struct Snake
 static const int screenWidth = 800;
 static const int screenHeight = 450;
 
+static int frame_counter = 0;
+
 static Vector2 offset;
 
 static Snake snake;
@@ -61,6 +63,9 @@ void InitGame()
     offset.x = screenWidth % SIZE_SQUARE;
     offset.y = screenHeight % SIZE_SQUARE;
 
+    // frame
+    frame_counter = 0;
+
     // init "Snake"
     snake_length = 1;
     snake.position = (Vector2){offset.x / 2, offset.y / 2};
@@ -87,6 +92,13 @@ void DrawGame()
 
 void UpdateGame()
 {
+    if (frame_counter % 5 == 0)
+    {
+        snake.position.x += snake.speed.x;
+        snake.position.y += snake.speed.y;
+    }
+
+    frame_counter++;
 }
 
 void UpdateDrawFrame()
