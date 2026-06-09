@@ -23,11 +23,36 @@ static Snake snake;
 static int snake_length = 0;
 
 // Module Functions Declaration (local)
-static void InitGame(); // Initialize game
-static void DrawGame(); // Draw game (one frame)
-// static void UpdateGame();      // Update game (one frame)
+static void InitGame();        // Initialize game
+static void DrawGame();        // Draw game (one frame)
+static void UpdateGame();      // Update game (one frame)
 static void UpdateDrawFrame(); // Update and Draw
 static void ShowFPS();         // Show FPS on screen        // Show FPS on screen
+
+// Logic Functions Declaration
+void DrawPlatform();
+
+// Logic Functions Init
+void DrawPlatform()
+{
+    // Horizontal lines "Platform"
+    for (int i = 0; i <= screenHeight / SIZE_SQUARE; i++)
+    {
+        DrawLineV(
+            (Vector2){offset.x / 2, (offset.y / 2) + (SIZE_SQUARE * i)},
+            (Vector2){screenWidth - (offset.x / 2), (offset.y / 2) + (SIZE_SQUARE * i)},
+            GRAY);
+    }
+
+    // Vertical lines "Platform"
+    for (int i = 0; i <= screenWidth / SIZE_SQUARE; i++)
+    {
+        DrawLineV(
+            (Vector2){(offset.x / 2) + (SIZE_SQUARE * i), offset.y / 2},
+            (Vector2){(offset.x / 2) + (SIZE_SQUARE * i), screenHeight - (offset.y / 2)},
+            GRAY);
+    }
+}
 
 // Module Functions Init (local)
 void InitGame()
@@ -36,11 +61,12 @@ void InitGame()
     offset.x = screenWidth % SIZE_SQUARE;
     offset.y = screenHeight % SIZE_SQUARE;
 
-    // init "snake"
+    // init "Snake"
     snake_length = 1;
     snake.position = (Vector2){offset.x / 2, offset.y / 2};
     snake.size = {SIZE_SQUARE, SIZE_SQUARE};
     snake.color = DARKBLUE;
+    snake.speed = Vector2{SIZE_SQUARE, 0};
 }
 
 void DrawGame()
@@ -50,23 +76,8 @@ void DrawGame()
     // Background
     ClearBackground(WHITE);
 
-    // Horizontal lines "Surface"
-    for (int i = 0; i <= screenHeight / SIZE_SQUARE; i++)
-    {
-        DrawLineV(
-            (Vector2){offset.x / 2, (offset.y / 2) + (SIZE_SQUARE * i)},
-            (Vector2){screenWidth - (offset.x / 2), (offset.y / 2) + (SIZE_SQUARE * i)},
-            GRAY);
-    }
-
-    // Vertical lines "Surface"
-    for (int i = 0; i <= screenWidth / SIZE_SQUARE; i++)
-    {
-        DrawLineV(
-            (Vector2){(offset.x / 2) + (SIZE_SQUARE * i), offset.y / 2},
-            (Vector2){(offset.x / 2) + (SIZE_SQUARE * i), screenHeight - (offset.y / 2)},
-            GRAY);
-    }
+    // Platform
+    DrawPlatform();
 
     // Snake
     DrawRectangleV(snake.position, snake.size, snake.color);
@@ -74,9 +85,13 @@ void DrawGame()
     EndDrawing();
 }
 
+void UpdateGame()
+{
+}
+
 void UpdateDrawFrame()
 {
-    // UpdateGame();
+    UpdateGame();
     DrawGame();
 }
 
