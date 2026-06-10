@@ -13,6 +13,14 @@ struct Snake
     Color color;
 };
 
+// Food
+struct Food
+{
+    Vector2 position;
+    Vector2 size;
+    Color color;
+};
+
 // Global Variables Declaration
 static const int screenWidth = 800;
 static const int screenHeight = 450;
@@ -24,6 +32,8 @@ static Vector2 offset;
 static Snake snake;
 static int snake_length = 0;
 
+static Food food;
+
 // Module Functions Declaration (local)
 static void InitGame();        // Initialize game
 static void DrawGame();        // Draw game (one frame)
@@ -33,6 +43,8 @@ static void ShowFPS();         // Show FPS on screen        // Show FPS on scree
 
 // Logic Functions Declaration
 void DrawPlatform();
+void SnakeInit();
+void FoodInit();
 
 // Logic Functions Init
 void DrawPlatform()
@@ -56,6 +68,25 @@ void DrawPlatform()
     }
 }
 
+void SnakeInit()
+{
+    snake_length = 1;
+    snake.position = (Vector2){offset.x / 2, offset.y / 2};
+    snake.size = {SIZE_SQUARE, SIZE_SQUARE};
+    snake.color = DARKBLUE;
+    snake.speed = Vector2{SIZE_SQUARE, 0};
+}
+
+void FoodInit()
+{
+    food.position = (Vector2){
+        GetRandomValue(0, (screenWidth / SIZE_SQUARE - 1)) * SIZE_SQUARE + offset.x / 2,
+        GetRandomValue(0, (screenHeight / SIZE_SQUARE - 1)) * SIZE_SQUARE + offset.y / 2,
+    };
+    food.size = {SIZE_SQUARE, SIZE_SQUARE};
+    food.color = GREEN;
+}
+
 // Module Functions Init (local)
 void InitGame()
 {
@@ -63,15 +94,14 @@ void InitGame()
     offset.x = screenWidth % SIZE_SQUARE;
     offset.y = screenHeight % SIZE_SQUARE;
 
-    // frame
+    // Frame
     frame_counter = 0;
 
-    // init "Snake"
-    snake_length = 1;
-    snake.position = (Vector2){offset.x / 2, offset.y / 2};
-    snake.size = {SIZE_SQUARE, SIZE_SQUARE};
-    snake.color = DARKBLUE;
-    snake.speed = Vector2{SIZE_SQUARE, 0};
+    // Init "Snake"
+    SnakeInit();
+
+    // Init "Food"
+    FoodInit();
 }
 
 void DrawGame()
@@ -87,11 +117,15 @@ void DrawGame()
     // Snake
     DrawRectangleV(snake.position, snake.size, snake.color);
 
+    // Food
+    DrawRectangleV(food.position, food.size, food.color);
+
     EndDrawing();
 }
 
 void UpdateGame()
 {
+    // Snake movement
     if (frame_counter % 5 == 0)
     {
         snake.position.x += snake.speed.x;
