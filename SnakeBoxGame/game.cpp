@@ -125,6 +125,16 @@ void DrawGame()
 
 void UpdateGame()
 {
+    // Input
+    if ((IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN)) && (snake.speed.y == 0))
+        snake.speed = Vector2{0, SIZE_SQUARE};
+    if ((IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP)) && (snake.speed.y == 0))
+        snake.speed = Vector2{0, -SIZE_SQUARE};
+    if ((IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT)) && (snake.speed.x == 0))
+        snake.speed = Vector2{-SIZE_SQUARE, 0};
+    if ((IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT)) && (snake.speed.x == 0))
+        snake.speed = Vector2{SIZE_SQUARE, 0};
+
     // Snake movement
     if (frame_counter % 5 == 0)
     {
