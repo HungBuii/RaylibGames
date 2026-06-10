@@ -2,7 +2,7 @@
 #include "raylib.h"
 
 #define SIZE_SQUARE 31
-// #define SNAKE_LENGTH 350
+#define SNAKE_LENGTH 350
 
 // Snake
 struct Snake
@@ -19,6 +19,7 @@ struct Food
     Vector2 position;
     Vector2 size;
     Color color;
+    bool active;
 };
 
 // Global Variables Declaration
@@ -29,8 +30,10 @@ static int frame_counter = 0;
 
 static Vector2 offset;
 
-static Snake snake;
+static Snake snake[SNAKE_LENGTH];
 static int snake_length = 0;
+static int counterTail = 1;
+static Vector2 snakeTailPos[SNAKE_LENGTH];
 
 static Food food;
 
@@ -45,6 +48,10 @@ static void ShowFPS();         // Show FPS on screen        // Show FPS on scree
 void DrawPlatform();
 void SnakeInit();
 void FoodInit();
+void Input();
+void Movement();
+void SpawnFood();
+void Eat();
 
 // Logic Functions Init
 void DrawPlatform()
@@ -70,21 +77,100 @@ void DrawPlatform()
 
 void SnakeInit()
 {
+    counterTail = 1;
     snake_length = 1;
-    snake.position = (Vector2){offset.x / 2, offset.y / 2};
-    snake.size = {SIZE_SQUARE, SIZE_SQUARE};
-    snake.color = DARKBLUE;
-    snake.speed = Vector2{SIZE_SQUARE, 0};
+    for (int i = 0; i < SNAKE_LENGTH; i++)
+    {
+        snake[i].position = (Vector2){offset.x / 2, offset.y / 2};
+        snake[i].size = (Vector2){SIZE_SQUARE, SIZE_SQUARE};
+        snake[i].speed = (Vector2){SIZE_SQUARE, 0};
+
+        if (i == 0)
+            snake[i].color = DARKBLUE;
+        else
+            snake[i].color = BLUE;
+    }
+
+    for (int i = 0; i < SNAKE_LENGTH; i++)
+    {
+        snakeTailPos[i] = (Vector2){0.0f, 0.0f};
+    }
 }
 
 void FoodInit()
 {
     food.position = (Vector2){
-        GetRandomValue(0, (screenWidth / SIZE_SQUARE - 1)) * SIZE_SQUARE + offset.x / 2,
-        GetRandomValue(0, (screenHeight / SIZE_SQUARE - 1)) * SIZE_SQUARE + offset.y / 2,
-    };
+        GetRandomValue(0, (screenWidth / SIZE_SQUARE) - 1) * SIZE_SQUARE + offset.x / 2,
+        GetRandomValue(0, (screenHeight / SIZE_SQUARE) - 1) * SIZE_SQUARE + offset.y / 2};
     food.size = {SIZE_SQUARE, SIZE_SQUARE};
     food.color = GREEN;
+    food.active = false;
+}
+
+void Input()
+{
+    if ((IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN)) && (snake[0].speed.y == 0))
+        snake[0].speed = Vector2{0, SIZE_SQUARE};
+    if ((IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP)) && (snake[0].speed.y == 0))
+        snake[0].speed = Vector2{0, -SIZE_SQUARE};
+    if ((IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT)) && (snake[0].speed.x == 0))
+        snake[0].speed = Vector2{-SIZE_SQUARE, 0};
+    if ((IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT)) && (snake[0].speed.x == 0))
+        snake[0].speed = Vector2{SIZE_SQUARE, 0};
+}
+
+void Movement()
+{
+    for (int i = 0; i < counterTail; i++)
+    {
+        snakeTailPos[i] = snake[i].position;
+    }
+
+    if (frame_counter % 5 == 0)
+    {
+        for (int i = 0; i < counterTail; i++)
+        {
+            if (i == 0)
+            {
+                snake[0].position.x += snake[0].speed.x;
+                snake[0].position.y += snake[0].speed.y;
+            }
+            else
+                snake[i].position = snakeTailPos[i - 1];
+        }
+    }
+    frame_counter++;
+}
+
+void SpawnFood()
+{
+    if (!food.active)
+    {
+        food.active = true;
+
+        for (int i = 0; i < 1; i++)
+        {
+            while ((food.position.x == snake[i].position.x) && (food.position.y == snake[i].position.y))
+            {
+                food.position = (Vector2){
+                    GetRandomValue(0, (screenWidth / SIZE_SQUARE) - 1) * SIZE_SQUARE + offset.x / 2,
+                    GetRandomValue(0, (screenHeight / SIZE_SQUARE) - 1) * SIZE_SQUARE + offset.y / 2};
+
+                i = 0;
+            }
+        }
+    }
+}
+
+void Eat()
+{
+    if ((snake[0].position.x == food.position.x) && (snake[0].position.y == food.position.y))
+    {
+        snake[counterTail].position = snakeTailPos[counterTail - 1];
+        counterTail++;
+
+        food.active = false;
+    }
 }
 
 // Module Functions Init (local)
@@ -115,7 +201,10 @@ void DrawGame()
     DrawPlatform();
 
     // Snake
-    DrawRectangleV(snake.position, snake.size, snake.color);
+    for (int i = 0; i < counterTail; i++)
+    {
+        DrawRectangleV(snake[i].position, snake[i].size, snake[i].color);
+    }
 
     // Food
     DrawRectangleV(food.position, food.size, food.color);
@@ -126,23 +215,16 @@ void DrawGame()
 void UpdateGame()
 {
     // Input
-    if ((IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN)) && (snake.speed.y == 0))
-        snake.speed = Vector2{0, SIZE_SQUARE};
-    if ((IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP)) && (snake.speed.y == 0))
-        snake.speed = Vector2{0, -SIZE_SQUARE};
-    if ((IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT)) && (snake.speed.x == 0))
-        snake.speed = Vector2{-SIZE_SQUARE, 0};
-    if ((IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT)) && (snake.speed.x == 0))
-        snake.speed = Vector2{SIZE_SQUARE, 0};
+    Input();
 
     // Snake movement
-    if (frame_counter % 5 == 0)
-    {
-        snake.position.x += snake.speed.x;
-        snake.position.y += snake.speed.y;
-    }
+    Movement();
 
-    frame_counter++;
+    // "Food" spawn
+    SpawnFood();
+
+    // "Snake" collision "Food"
+    Eat();
 }
 
 void UpdateDrawFrame()
