@@ -148,7 +148,7 @@ void SpawnFood()
     {
         food.active = true;
 
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < counterTail; i++)
         {
             while ((food.position.x == snake[i].position.x) && (food.position.y == snake[i].position.y))
             {
