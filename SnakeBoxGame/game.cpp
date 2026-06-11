@@ -37,12 +37,17 @@ static Vector2 snakeTailPos[SNAKE_LENGTH];
 
 static Food food;
 
+static int score = 0;
+static int hiScore = 0;
+
+static bool gameOver = false;
+
 // Module Functions Declaration (local)
 static void InitGame();        // Initialize game
 static void DrawGame();        // Draw game (one frame)
 static void UpdateGame();      // Update game (one frame)
 static void UpdateDrawFrame(); // Update and Draw
-static void ShowFPS();         // Show FPS on screen        // Show FPS on screen
+static void ShowFPS();         // Show FPS on screen
 
 // Logic Functions Declaration
 void DrawPlatform();
@@ -52,6 +57,7 @@ void Input();
 void Movement();
 void SpawnFood();
 void Eat();
+void StatusCharacter();
 
 // Logic Functions Init
 void DrawPlatform()
@@ -169,7 +175,30 @@ void Eat()
         snake[counterTail].position = snakeTailPos[counterTail - 1];
         counterTail++;
 
+        score += 100;
+        if (hiScore < score)
+            hiScore = score;
+
         food.active = false;
+    }
+}
+
+void StatusCharacter()
+{
+    // "Snake" collision "Wall"
+    if ((snake[0].position.x < offset.x / 2) || (snake[0].position.x >= screenWidth - offset.x / 2) || (snake[0].position.y < offset.y / 2) || (snake[0].position.y >= screenHeight - offset.y / 2))
+    {
+        gameOver = true;
+    }
+
+    // "Snake" collsion "Tail" itself
+    for (int i = 1; i < counterTail; i++)
+    {
+        if ((snake[0].position.x == snake[i].position.x) && snake[0].position.y == snake[i].position.y)
+        {
+            gameOver = true;
+            break;
+        }
     }
 }
 
@@ -182,6 +211,12 @@ void InitGame()
 
     // Frame
     frame_counter = 0;
+
+    // Score
+    score = 0;
+
+    // status game
+    gameOver = false;
 
     // Init "Snake"
     SnakeInit();
@@ -197,34 +232,74 @@ void DrawGame()
     // Background
     ClearBackground(WHITE);
 
-    // Platform
-    DrawPlatform();
-
-    // Snake
-    for (int i = 0; i < counterTail; i++)
+    if (gameOver)
     {
-        DrawRectangleV(snake[i].position, snake[i].size, snake[i].color);
+        char textGameOver[] = "Game Over! Press [ENTER] To Play Again";
+        DrawText(textGameOver, GetScreenWidth() / 2 - MeasureText(textGameOver, 20) / 2, GetScreenHeight() / 2 - 50, 20, GRAY);
+
+        char textScore[] = "Score :";
+        int posXTextScore = GetScreenWidth() / 2 - MeasureText(textScore, 20) / 2;
+        int posYTextScore = GetScreenHeight() / 2 - 40 + 30;
+        DrawText(textScore, posXTextScore, posYTextScore, 20, GRAY);
+        DrawText(TextFormat("%01i", score), posXTextScore + 90, posYTextScore, 20, GRAY);
+
+        char textHiScore[] = "Hi Score :";
+        int posXTextHiScore = GetScreenWidth() / 2 - MeasureText(textScore, 20) / 2;
+        int posYTextHiScore = GetScreenHeight() / 2 - 40 + 60;
+        DrawText(textHiScore, posXTextHiScore, posYTextHiScore, 20, GRAY);
+        DrawText(TextFormat("%01i", hiScore), posXTextHiScore + 110, posYTextHiScore, 20, GRAY);
     }
 
-    // Food
-    DrawRectangleV(food.position, food.size, food.color);
+    else
+    {
+        // Platform
+        DrawPlatform();
+
+        // Snake
+        for (int i = 0; i < counterTail; i++)
+        {
+            DrawRectangleV(snake[i].position, snake[i].size, snake[i].color);
+        }
+
+        // Food
+        DrawRectangleV(food.position, food.size, food.color);
+
+        // Score
+        DrawText(TextFormat("%04i", score), 20, 40, 30, RED);
+        // DrawText(TextFormat("%04i", hiScore), 20, 80, 30, RED);
+    }
 
     EndDrawing();
 }
 
 void UpdateGame()
 {
-    // Input
-    Input();
+    if (!gameOver)
+    {
+        // Input
+        Input();
 
-    // Snake movement
-    Movement();
+        // Snake movement
+        Movement();
 
-    // "Food" spawn
-    SpawnFood();
+        // "Food" spawn
+        SpawnFood();
 
-    // "Snake" collision "Food"
-    Eat();
+        // "Snake" eat "Food"
+        Eat();
+
+        // Game status
+        StatusCharacter();
+    }
+    else
+    {
+        if (IsKeyPressed(KEY_ENTER))
+        {
+            gameOver = false;
+
+            InitGame();
+        }
+    }
 }
 
 void UpdateDrawFrame()
@@ -235,7 +310,7 @@ void UpdateDrawFrame()
 
 void ShowFPS()
 {
-    DrawFPS(0, 10);
+    DrawFPS(screenWidth - 75, 10);
 }
 
 int main()
@@ -248,7 +323,7 @@ int main()
 
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        // ShowFPS();
+        ShowFPS();
 
         UpdateDrawFrame();
     }
